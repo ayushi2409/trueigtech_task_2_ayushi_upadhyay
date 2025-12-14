@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from app.database import Base, engine
 
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.models.user import User
 from app.models.plan import Plan
 from app.models.subscription import Subscription
@@ -18,6 +20,18 @@ app = FastAPI(title="FitPlanHub API")
 def startup():
     Base.metadata.create_all(bind=engine)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",   # Vite frontend
+        "http://127.0.0.1:5173"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],   # VERY IMPORTANT
+    allow_headers=["*"],   # VERY IMPORTANT
+)
+
+
 app.include_router(auth_router)
 app.include_router(plans_router)
 app.include_router(sub_router)
@@ -27,3 +41,4 @@ app.include_router(feed_router)
 @app.get("/")
 def root():
     return {"message": "FitPlanHub Backend Running"}
+
